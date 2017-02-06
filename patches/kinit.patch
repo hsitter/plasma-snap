@@ -1,0 +1,117 @@
+diff --git a/src/start_kdeinit/start_kdeinit.c b/src/start_kdeinit/start_kdeinit.c
+index 2765901..d8761f9 100644
+--- a/src/start_kdeinit/start_kdeinit.c
++++ b/src/start_kdeinit/start_kdeinit.c
+@@ -21,6 +21,7 @@
+ 
+ #include <errno.h>
+ #include <fcntl.h>
++#include <limits.h>
+ #include <signal.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+@@ -31,7 +32,36 @@
+ #include <sys/capability.h>
+ #endif
+ 
+-#define EXECUTE CMAKE_INSTALL_FULL_BINDIR "/kdeinit5"
++#define EXE_NAME "kdeinit5"
++#define INSTALL_EXE_PATH CMAKE_INSTALL_FULL_BINDIR "/" EXE_NAME
++
++static char *exe_path()
++{
++    static char path[PATH_MAX];
++    static int initd = 0;
++    if (initd == 1) {
++        return path;
++    }
++    initd = 1;
++
++    char *paths = getenv("PATH");
++    char *dir = NULL;
++    char search_path[PATH_MAX];
++
++    for (dir = strtok(paths, ":"); dir; dir = strtok(NULL, ":")) {
++        sprintf(search_path, "%s/%s", dir, EXE_NAME);
++        struct stat buf;
++        if (stat(search_path, &buf) == 0 && buf.st_mode & S_IXUSR) {
++            strncpy(path, search_path, PATH_MAX);
++            return path;
++        }
++    }
++
++    strncpy(path, INSTALL_EXE_PATH, PATH_MAX);
++    return path;
++}
++
++#define EXECUTE exe_path()
+ 
+ #if KDEINIT_OOM_PROTECT
+ 
+diff --git a/src/start_kdeinit/start_kdeinit_wrapper.c b/src/start_kdeinit/start_kdeinit_wrapper.c
+index 891f50c..df794f1 100644
+--- a/src/start_kdeinit/start_kdeinit_wrapper.c
++++ b/src/start_kdeinit/start_kdeinit_wrapper.c
+@@ -19,6 +19,9 @@
+ 
+ #include <config-kdeinit.h>
+ 
++#include <libgen.h>
++#include <limits.h>
++#include <stdlib.h>
+ #include <stdio.h>
+ #include <string.h>
+ #include <unistd.h>
+@@ -27,6 +30,30 @@
+ 
+ #if KDEINIT_OOM_PROTECT
+ 
++static char *exe_path()
++{
++    static char exe_path[PATH_MAX];
++    static int initd = 0;
++    if (initd == 1) {
++        return exe_path;
++    }
++    initd = 1;
++
++    char *bin_path = realpath("/proc/self/exe", NULL);
++    if (bin_path == NULL) {
++        /* Failed to resolve, return hard-compiled path. */
++        strncpy(exe_path, EXECUTE, PATH_MAX);
++        return exe_path;
++    }
++
++    printf("bin_path: %s\n", bin_path);
++    sprintf(exe_path, "%s/start_kdeinit", dirname(bin_path));
++    free(bin_path);
++    printf("exe_path: %s\n", exe_path);
++
++    return exe_path;
++}
++
+ /*
+  The start_kdeinit wrapper is setuid, which means some shell variables like LD_LIBRARY_PATH
+  get unset before it's launched. However kdeinit is used to launch most of KDE, so such variables
+@@ -53,8 +80,8 @@ int main(int argc, char **argv)
+         close(0);   /* stdin */
+         dup2(pipes[ 0 ], 0);
+         close(pipes[ 0 ]);
+-        argv[ 0 ] = (char *)EXECUTE;
+-        execvp(EXECUTE, argv);
++        argv[ 0 ] = exe_path();
++        execvp(exe_path(), argv);
+         perror("start_kdeinit");
+         return 1;
+     case 0: { /* child, pass env and exit */
+@@ -87,8 +114,8 @@ int main(int argc, char **argv)
+     if (argc == 0) {
+         return 1;
+     }
+-    argv[0] = (char *)EXECUTE;
+-    execvp(EXECUTE, argv);
++    argv[0] = exe_path();
++    execvp(exe_path(), argv);
+     perror("start_kdeinit");
+     return 1;
+ }

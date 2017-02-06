@@ -1,0 +1,23 @@
+diff -urNad xorg-server-1.18.4.orig/xkb/ddxLoad.c xorg-server-1.18.4/xkb/ddxLoad.c
+--- xorg-server-1.18.4.orig/xkb/ddxLoad.c	2016-07-15 18:18:11.000000000 +0200
++++ xorg-server-1.18.4/xkb/ddxLoad.c	2017-02-06 17:15:57.352528328 +0100
+@@ -149,9 +149,8 @@
+     }
+ 
+     if (asprintf(&buf,
+-                 "\"%s%sxkbcomp\" -w %d %s -xkm \"%s\" "
++                 "\"xkbcomp\" -w %d %s -xkm \"%s\" "
+                  "-em1 %s -emp %s -eml %s \"%s%s.xkm\"",
+-                 xkbbindir, xkbbindirsep,
+                  ((xkbDebugFlags < 2) ? 1 :
+                   ((xkbDebugFlags > 10) ? 10 : (int) xkbDebugFlags)),
+                  xkbbasedirflag ? xkbbasedirflag : "", xkmfile,
+@@ -159,6 +158,8 @@
+                  xkm_output_dir, keymap) == -1)
+         buf = NULL;
+ 
++    LogMessage(X_ERROR, "XKBBBB %s", buf);
++    
+     free(xkbbasedirflag);
+ 
+     if (!buf) {
