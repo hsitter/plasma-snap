@@ -216,7 +216,7 @@ export XDG_CURRENT_DESKTOP
 QT_QPA_PLATFORM=wayland
 export QT_QPA_PLATFORM
 
-kwin_wayland --xwayland --libinput --exit-with-session=$SNAP/usr/lib/x86_64-linux-gnu/libexec/startplasma
+kwin_wayland --xwayland --libinput --exit-with-session=$HOME/bin/startplasma
 
 echo 'startplasmacompositor: Shutting down...'  1>&2
 
