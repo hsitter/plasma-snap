@@ -1,0 +1,48 @@
+---
+name: plasma
+version: 5.9
+summary: wow
+description: phew
+confinement: strict
+grade: stable
+
+apps:
+    plasma:
+        command: bash
+        plugs:
+        - home
+        - x11
+        - opengl
+        - network
+        - network-bind
+        - unity7
+        - pulseaudio
+
+slots:
+    kglobalaccel-dbus:
+        interface: dbus
+        bus: session
+        name: org.kde.kglobalaccel
+    plasma-dbus:
+        interface: dbus
+        bus: session
+        name: org.kde.plasmashell
+    kded-dbus:
+        interface: dbus
+        bus: session
+        name: org.kde.kded5
+    plasmanm-dbus:
+        interface: dbus
+        bus: session
+        name: org.kde.plasmanetworkmanagement
+    kwin-dbus:
+        interface: dbus
+        bus: session
+        name: org.kde.KWin
+
+parts:
+    plasma:
+        stage-packages: [plasma-workspace-wayland, plasma-desktop, gdb, strace, vim, kwin-wayland-backend-x11, libxkbcommon-x11-0, libxkbcommon0, libx11-data, xkb-data, ltrace, kwrite, plasma-workspace]
+        plugin: dump
+        source: empty
+
