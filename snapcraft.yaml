@@ -9,7 +9,7 @@ grade: stable
 apps:
     plasma:
         command: bash
-        slots: [mir]
+        slots: [mir, upower-observe]
         plugs:
         - home
         - x11
