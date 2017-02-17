@@ -42,7 +42,7 @@ slots:
 
 parts:
     plasma:
-        stage-packages: [plasma-workspace-wayland, plasma-desktop, gdb, strace, vim, kwin-wayland-backend-x11, libxkbcommon-x11-0, libxkbcommon0, libx11-data, xkb-data, ltrace, kwrite, plasma-workspace, konsole]
+        stage-packages: [plasma-workspace-wayland, plasma-desktop, gdb, strace, vim, kwin-wayland-backend-x11, libxkbcommon-x11-0, libxkbcommon0, libx11-data, xkb-data, ltrace, kwrite, plasma-workspace, konsole, kwin-wayland-backend-drm]
         plugin: dump
         source: empty
         organize:
