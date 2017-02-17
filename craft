@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
 
+system('snapcraft clean')
 system('snapcraft') || raise
 system('zsyncmake *snap') || raise
