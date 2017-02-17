@@ -1,3 +1,109 @@
+diff --git a/src/kdeinit/kinit.cpp b/src/kdeinit/kinit.cpp
+index 523b715..297c3af 100644
+--- a/src/kdeinit/kinit.cpp
++++ b/src/kdeinit/kinit.cpp
+@@ -112,6 +112,39 @@ namespace KCrash
+ extern KCRASH_EXPORT bool loadedByKdeinit;
+ }
+ 
++#define EXECUTE CMAKE_INSTALL_FULL_LIBEXECDIR_KF5 "/klauncher"
++
++static char *exe_path()
++{
++    static char exe_path[PATH_MAX];
++    static int initd = 0;
++    if (initd == 1) {
++        return exe_path;
++    }
++    initd = 1;
++
++
++    char *bin_path = realpath("/proc/self/exe", NULL);
++    if (bin_path == NULL) {
++        /* Failed to resolve, return hard-compiled path. */
++        strncpy(exe_path, EXECUTE, PATH_MAX);
++        return exe_path;
++    }
++
++    // FIXME: this is wrong, we'd have to resolve relativity of installed-kdeinit to installed-klauncher
++    //    then get running-kdeinit's and use the relative path to determine where klauncher is to be
++    //    found.
++//    QFileInfo info(QString::fromLatin1(bin_path));
++//    free(bin_path);
++//    auto relativePath = info.dir().relativeFilePath(QLatin1String(EXECUTE)) + QLatin1String("/klauncher");
++//    strncpy(exe_path, relativePath.toLatin1().constData(), PATH_MAX);
++    auto relativePath = QStandardPaths::findExecutable(QStringLiteral("klauncher"));
++    qDebug() << relativePath;
++    strncpy(exe_path, relativePath.toLatin1().constData(), PATH_MAX);
++
++    return exe_path;
++}
++
+ extern char **environ;
+ 
+ #if HAVE_X11
+@@ -991,7 +1024,8 @@ static void start_klauncher()
+     char args[32];
+     strcpy(args, "--fd=");
+     sprintf(args + 5, "%d", d.launcher[1]);
+-    d.launcher_pid = launch(2, CMAKE_INSTALL_FULL_LIBEXECDIR_KF5 "/klauncher", args);
++    qDebug() << Q_FUNC_INFO << exe_path();
++    d.launcher_pid = launch(2, exe_path(), args);
+     close(d.launcher[1]);
+ #ifndef NDEBUG
+     fprintf(stderr, "kdeinit5: Launched KLauncher, pid = %ld, result = %d\n",
+@@ -1533,20 +1567,6 @@ static int initXconnection()
+ }
+ #endif
+ 
+-#ifndef Q_OS_OSX
+-// Find a shared lib in the lib dir, e.g. libkio.so.
+-// Completely unrelated to plugins.
+-static QString findSharedLib(const QString &lib)
+-{
+-    QString path = QFile::decodeName(CMAKE_INSTALL_PREFIX "/" LIB_INSTALL_DIR "/") + lib;
+-    if (QFile::exists(path)) {
+-        return path;
+-    }
+-    // We could also look in LD_LIBRARY_PATH, but really, who installs the main libs in different prefixes?
+-    return QString();
+-}
+-#endif
+-
+ extern "C" {
+ 
+     static void secondary_child_handler(int)
+@@ -1558,6 +1578,7 @@ extern "C" {
+ 
+ int main(int argc, char **argv)
+ {
++    qDebug() << "PATCHED KDEINIT";
+ #ifndef _WIN32_WCE
+     setlocale(LC_ALL, "");
+     setlocale(LC_NUMERIC, "C");
+@@ -1692,18 +1713,14 @@ int main(int argc, char **argv)
+     if (!d.suicide && qEnvironmentVariableIsEmpty("KDE_IS_PRELINKED")) {
+         const int extrasCount = sizeof(extra_libs) / sizeof(extra_libs[0]);
+         for (int i = 0; i < extrasCount; i++) {
+-            const QString extra = findSharedLib(QString::fromLatin1(extra_libs[i]));
+-            if (!extra.isEmpty()) {
+-                QLibrary l(extra);
+-                l.setLoadHints(QLibrary::ExportExternalSymbolsHint);
+-                (void)l.load();
+-            }
++            QLibrary l(QString::fromLatin1(extra_libs[i]));
++            l.setLoadHints(QLibrary::ExportExternalSymbolsHint);
++            (void)l.load();
+ #ifndef NDEBUG
+-            else {
++            if (!l.isLoaded()) {
+                 fprintf(stderr, "%s was not found.\n", extra_libs[i]);
+             }
+ #endif
+-
+         }
+     }
+ #endif
 diff --git a/src/start_kdeinit/start_kdeinit.c b/src/start_kdeinit/start_kdeinit.c
 index 2765901..d8761f9 100644
 --- a/src/start_kdeinit/start_kdeinit.c
