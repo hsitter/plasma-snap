@@ -9,6 +9,7 @@ grade: stable
 apps:
     plasma:
         command: bash
+        slots: [mir]
         plugs:
         - home
         - x11
