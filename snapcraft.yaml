@@ -18,6 +18,7 @@ apps:
         - network-bind
         - unity7
         - pulseaudio
+        - plasma
 
 slots:
     kglobalaccel-dbus:
