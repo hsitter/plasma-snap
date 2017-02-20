@@ -18,7 +18,9 @@ apps:
         - network-bind
         - unity7
         - pulseaudio
+        - network-manager
         - plasma
+        - udisks2
 
 slots:
     kglobalaccel-dbus:
