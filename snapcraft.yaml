@@ -43,6 +43,66 @@ slots:
         interface: dbus
         bus: session
         name: org.kde.KWin
+    klauncher-dbus:
+        interface: dbus
+        bus: session
+        name: org.kde.klauncher5
+    ksplash-dbus:
+        interface: dbus
+        bus: session
+        name: org.kde.KSplash
+    screensaver-dbus:
+        interface: dbus
+        bus: session
+        name: org.kde.screensaver
+    ksmserver-dbus:
+        interface: dbus
+        bus: session
+        name: org.kde.ksmserver
+    krunner-dbus:
+        interface: dbus
+        bus: session
+        name: org.kde.krunner
+    statusnotifierwatcher-dbus:
+        interface: dbus
+        bus: session
+        name: org.kde.StatusNotifierWatcher
+    kappmenu-dbus:
+        interface: dbus
+        bus: session
+        name: org.kde.kappmenu
+    kcookiejar-dbus:
+        interface: dbus
+        bus: session
+        name: org.kde.kcookiejar5
+    kcminit-dbus:
+        interface: dbus
+        bus: session
+        name: org.kde.kcminit
+    kaccess-dbus:
+        interface: dbus
+        bus: session
+        name: org.kde.kaccess
+    activitymanager-dbus:
+        interface: dbus
+        bus: session
+        name: org.kde.ActivityManager
+    statusnotifierhost-dbus:
+        interface: dbus
+        bus: session
+        name: org.kde.StatusNotifierHost
+    kuiserver-dbus:
+        interface: dbus
+        bus: session
+        name: org.kde.kuiserver
+    fdo-screensaver-dbus:
+        interface: dbus
+        bus: session
+        name: org.freedesktop.ScreenSaver
+    fdo-notifications-dbus:
+        interface: dbus
+        bus: session
+        name: org.freedesktop.Notifications
 
 parts:
     plasma:
