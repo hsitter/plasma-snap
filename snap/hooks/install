@@ -1,0 +1,4 @@
+#!/bin/bash
+
+mkdir -p /usr/share/xsessions/
+ln -s $SNAP/usr/share/xsessions/plasma.desktop /usr/share/xsessions/

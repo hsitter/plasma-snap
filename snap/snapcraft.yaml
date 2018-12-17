@@ -3,7 +3,7 @@ name: plasma
 version: 5.9
 summary: wow
 description: phew
-confinement: strict
+confinement: classic
 grade: stable
 
 apps:
@@ -115,3 +115,7 @@ parts:
         after: [plasma]
         plugin: dump
         source: xwayland
+    session:
+        after: [patchy]
+        plugin: dump
+        source: session
