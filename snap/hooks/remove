@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [ $(ls -1A | wc -l) = "1" ]
+then 
+ rm /usr/share/xsessions/plasma.desktop
+ rm -d /usr/share/xsessions/
+else
+ rm /usr/share/xsessions/plasma.desktop
+fi
